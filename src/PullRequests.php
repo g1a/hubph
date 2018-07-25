@@ -37,7 +37,8 @@ class PullRequests
         $titles = array_map(
             function ($pr) {
                 return $pr['title'];
-            }, $this->prs
+            },
+            $this->prs
         );
         return $titles;
     }

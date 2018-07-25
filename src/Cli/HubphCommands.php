@@ -407,12 +407,13 @@ class HubphCommands extends \Robo\Tasks implements ConfigAwareInterface, LoggerA
         return
             array_column(
                 array_map(
-                    function ($k) use($data, $field) {
+                    function ($k) use ($data, $field) {
                         return [$data[$k][$field], $data[$k]];
                     },
                     array_keys($data)
                 ),
-                1, 0
+                1,
+                0
             );
     }
 

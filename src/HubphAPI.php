@@ -35,7 +35,7 @@ class HubphAPI
 
     public function prClose($org, $project, $number)
     {
-        foreach ( (array)$number as $n) {
+        foreach ((array)$number as $n) {
             $gitHubAPI = $this->gitHubAPI();
             $gitHubAPI->api('pull_request')->update($org, $project, $n, ['state' => 'closed']);
         }
@@ -70,7 +70,6 @@ class HubphAPI
         $result = new PullRequests();
 
         foreach ($vids->ids() as $vid) {
-
             // TODO: we could exit early if $result already contains all $vid/$vval values
 
             $q = "$base_q $vid";
@@ -110,8 +109,7 @@ class HubphAPI
         if (file_exists($github_token_cache)) {
             $token = trim(file_get_contents($github_token_cache));
             putenv("GITHUB_TOKEN=$token");
-        }
-        else {
+        } else {
             $token = getenv('GITHUB_TOKEN');
         }
 
