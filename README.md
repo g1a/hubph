@@ -1,6 +1,6 @@
 # Hubph
 
-Put a one-line description of your project here.
+This is a prototype tool. Hubph (pronounced "huff") is like hub, but in php.
 
 [![Travis CI](https://travis-ci.org/g1a/hubph.svg?branch=master)](https://travis-ci.org/g1a/hubph)
 [![Windows CI](https://ci.appveyor.com/api/projects/status/{{PUT_APPVEYOR_STATUS_BADGE_ID_HERE}}?svg=true)](https://ci.appveyor.com/project/g1a/hubph)
