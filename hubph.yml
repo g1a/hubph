@@ -1,0 +1,5 @@
+github:
+  default-user: self
+  personal-auth-token:
+    self:
+      path: ${env.HOME}/.github-token

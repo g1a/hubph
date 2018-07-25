@@ -5,7 +5,7 @@ namespace Hubph;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\BufferedOutput;
 
-class ExampleCommandsTest extends TestCase
+class HubphCommandsTest extends TestCase
 {
     /** @var string[] */
     protected $commandClasses;
@@ -25,7 +25,7 @@ class ExampleCommandsTest extends TestCase
     public function setUp()
     {
         // Store the command classes we are going to test
-        $this->commandClasses = [ \Hubph\Cli\ExampleCommands::class ];
+        $this->commandClasses = [ \Hubph\Cli\HubphCommands::class ];
 
         // Define our invariants for our test
         $this->appName = 'TestFixtureApp';
@@ -38,23 +38,13 @@ class ExampleCommandsTest extends TestCase
      * Return an array of arrays, each of which contains the parameter
      * values to be used in one invocation of the testExample test function.
      */
-    public function exampleTestCommandParameters()
+    public function hubphTestCommandParameters()
     {
         return [
 
             [
-                '2 times 2 is 4', self::STATUS_OK,
-                'multiply', 2, 2,
-            ],
-
-            [
-                'Multiply two numbers together', self::STATUS_OK,
+                'pr:check', self::STATUS_OK,
                 'list',
-            ],
-
-            [
-                'Not enough arguments (missing: "b").', self::STATUS_ERROR,
-                'multiply', 7,
             ],
         ];
     }
@@ -64,9 +54,9 @@ class ExampleCommandsTest extends TestCase
      * be passed data from the data provider function idendified by the
      * dataProvider annotation.
      *
-     * @dataProvider exampleTestCommandParameters
+     * @dataProvider hubphTestCommandParameters
      */
-    public function testExampleCommands($expectedOutput, $expectedStatus, $variable_args)
+    public function testHubphCommands($expectedOutput, $expectedStatus, $variable_args)
     {
         // Create our argv array and run the command
         $argv = $this->argv(func_get_args());

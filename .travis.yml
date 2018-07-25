@@ -1,41 +1,41 @@
 dist: trusty
 language: php
-
 branches:
-  # Only test the master branch and SemVer tags.
   only:
-    - master
-    - /^[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+.*$/
-
+  - master
+  - "/^[[:digit:]]+\\.[[:digit:]]+\\.[[:digit:]]+.*$/"
 matrix:
   fast_finish: true
   include:
-    - php: 7.2
-      env: 'DEPENCENCIES=highest'
-    - php: 7.2
-    - php: 7.1
-    - php: 7.0.11
-    - php: 5.6
-      env: 'SCENARIO=phpunit5'
-    - php: 5.6
-      env: 'SCENARIO=phpunit5 DEPENDENCIES=lowest'
-
+  - php: 7.2
+    env: DEPENCENCIES=highest
+  - php: 7.2
+  - php: 7.1
+  - php: 7.0.11
+  - php: 5.6
+    env: SCENARIO=phpunit5
+  - php: 5.6
+    env: SCENARIO=phpunit5 DEPENDENCIES=lowest
 sudo: false
-
 cache:
   directories:
-    - $HOME/.composer/cache
-
+  - "$HOME/.composer/cache"
 install:
-  - 'composer scenario "${SCENARIO}" "${DEPENDENCIES}"'
-
+- composer scenario "${SCENARIO}" "${DEPENDENCIES}"
 script:
-  - composer test
-
+- composer test
 after_success:
-  - travis_retry php vendor/bin/php-coveralls -v
-
+- travis_retry php vendor/bin/php-coveralls -v
 before_deploy:
-  - composer phar:install-tools
-  - composer install --prefer-dist --no-dev --no-interaction
-  - php box.phar build
+- composer phar:install-tools
+- composer install --prefer-dist --no-dev --no-interaction
+- php box.phar build
+deploy:
+  provider: releases
+  api_key:
+    secure: SE8znvcrVq8oUd1MSYhbMxbTpFATOvq75Car5xVMx4VPz7OUBho6ixs27GhpqcNWAfdoFyL0yWVZTNsuxI8hukkvWMPXCZDOp966v/POqwf32LDZVm5aZlLbeOx7KA9i1psHcsag8FkkOxg2FAyWKjBaNZuxjS2N7p39X7PDp46huk+b553xTn90G2tbMhpZACJDpVXikjGbPfWi6Dp5kihi74ACbXhkXNPLj+tq3ixBdNQkPSGdUNboZA3nEyJKBLEvpAJzW6iKezOR5PZfF8L3iTObBA5DkJkttl12yI+CrpQjbvgNdBy+Ckhfb8vSjHsECXwHz7z6ITFTQ7SvxRT77gUwL11MxTdySP8o8nGE8dhGSgUZ9N20TkkgiOYpoF97XlD70XKqh/25S1fyTGaToIioy6iaH0ls/Wmi4VDOwGNS/Mm3If/GhTd18kmOKhooTwNK1inWwCMF8tzghBb5xemt/jF/ZTXK5AVLy2E4FUaQ3QLV+/ectc3IEX5FNQXvNLxB+OaONss//uNIHQd+cnVZEjvNBDpAlZZOPa6rFxYcZRiqQVRYU9kEFijp9s1am6njNNneG9kNEUjzF2mdO4zuZUEvgXpZfhzB7R80zeTSizirsyNy1dl35YyGHirAl+01/EDDUHthtvXPuTTqMO5xXPgzT2uaNh8/ebA=
+  file: hubph.phar
+  skip_cleanup: true
+  on:
+    tags: true
+    repo: g1a/hubph

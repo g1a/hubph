@@ -20,7 +20,8 @@
     },
     "require": {
         "php": ">=5.5.0",
-        "symfony/finder": "^2.8|^3|^4",
+        "consolidation/filter-via-dot-access-data": "^0.1",
+        "knplabs/github-api": "^2.7",
         "symfony/filesystem": "^2.8|^3|^4"
     },
     "require-dev": {

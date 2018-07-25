@@ -1,9 +1,9 @@
 {
-  "alias": "example.phar",
+  "alias": "hubph.phar",
   "chmod": "0755",
   "compactors": [],
   "directories": ["src"],
-  "files": ["example", "README.md", "VERSION"],
+  "files": ["hubph", "README.md", "VERSION"],
   "finder": [
     {
       "name": "*.php",
@@ -19,7 +19,7 @@
   ],
   "git-commit": "git-commit",
   "git-version": "git-version",
-  "output": "example.phar",
-  "main": "example",
+  "output": "hubph.phar",
+  "main": "hubph",
   "stub": true
 }
