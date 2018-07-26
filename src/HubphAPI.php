@@ -7,6 +7,7 @@ use Consolidation\Config\ConfigInterface;
 class HubphAPI
 {
     protected $config;
+    protected $token;
     protected $gitHubAPI;
     protected $as = 'default';
 
@@ -22,6 +23,7 @@ class HubphAPI
     {
         if ($as != $this->as) {
             $this->as = $as;
+            $this->token = false;
             $this->gitHubAPI = false;
         }
     }
@@ -64,6 +66,25 @@ class HubphAPI
         return [0, $existingPRs->prNumbers()];
     }
 
+    public function addTokenAuthentication($url)
+    {
+        $token = $this->gitHubToken();
+        if (!$token) {
+            return $url;
+        }
+        $projectAndOrg = $this->projectAndOrgFromUrl($url);
+        return "https://{$token}:x-oauth-basic@github.com/{$projectAndOrg}.git";
+    }
+
+    protected function projectAndOrgFromUrl($remote)
+    {
+        $remote = preg_replace('#^git@[^:]*:#', '', $remote);
+        $remote = preg_replace('#^[^:]*://[^/]/#', '', $remote);
+        $remote = preg_replace('#\.git$#', '', $remote);
+
+        return $remote;
+    }
+
     protected function existingPRs($gitHubAPI, $projectWithOrg, $vids)
     {
         $base_q = "repo:$projectWithOrg in:title is:pr state:open";
@@ -100,6 +121,14 @@ class HubphAPI
      * auth-token cache directory.
      */
     public function gitHubToken()
+    {
+        if (!$this->token) {
+            $this->token = $this->getGitHubToken();
+        }
+        return $this->token;
+    }
+
+    protected function getGitHubToken()
     {
         $as = $this->as;
         if ($as == 'default') {
