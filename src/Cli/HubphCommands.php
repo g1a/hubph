@@ -182,6 +182,11 @@ class HubphCommands extends \Robo\Tasks implements ConfigAwareInterface, LoggerA
     {
         $remote = $this->getRemote($remote, $cwd);
 
+        return $this->getProjectWithOrfFromUrl($remote);
+    }
+
+    protected function getProjectWithOrfFromUrl($remote)
+    {
         $remote = preg_replace('#^git@[^:]*:#', '', $remote);
         $remote = preg_replace('#^[^:]*://[^/]/#', '', $remote);
         $remote = preg_replace('#\.git$#', '', $remote);

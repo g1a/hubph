@@ -87,7 +87,7 @@ class HubphAPI
     public function gitHubAPI()
     {
         if (!$this->gitHubAPI) {
-            $token = $this->getGitHubToken();
+            $token = $this->gitHubToken();
 
             $this->gitHubAPI = new \Github\Client();
             $this->gitHubAPI->authenticate($token, null, \Github\Client::AUTH_HTTP_TOKEN);
@@ -99,7 +99,7 @@ class HubphAPI
      * Look up the GitHub token set either via environment variable or in the
      * auth-token cache directory.
      */
-    protected function getGitHubToken()
+    public function gitHubToken()
     {
         $as = $this->as;
         if ($as == 'default') {
