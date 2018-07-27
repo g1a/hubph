@@ -13,17 +13,15 @@ class PullRequests
     {
     }
 
-    public function addSearchResults($searchResults)
+    public function addSearchResults($searchResults, $pattern = '')
     {
-        //print "Search results with $vid: ($q)\n";
-        //var_export($searchResults);
-        //print "\n";
-
         $total = $searchResults['total_count'];
         $incomplete = $searchResults['incomplete_results'];
 
         foreach ($searchResults['items'] as $pr) {
-            $this->add($pr);
+            if (empty($pattern) || preg_match("#{$pattern}#", $pr['title'])) {
+                $this->add($pr);
+            }
         }
     }
 

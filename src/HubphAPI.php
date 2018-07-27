@@ -87,17 +87,11 @@ class HubphAPI
 
     protected function existingPRs($gitHubAPI, $projectWithOrg, $vids)
     {
-        $base_q = "repo:$projectWithOrg in:title is:pr state:open";
+        $preamble = $vids->getPreamble();
+        $q = "repo:$projectWithOrg in:title is:pr state:open $preamble";
         $result = new PullRequests();
-
-        foreach ($vids->ids() as $vid) {
-            // TODO: we could exit early if $result already contains all $vid/$vval values
-
-            $q = "$base_q $vid";
-            $searchResults = $gitHubAPI->api('search')->issues($q);
-
-            $result->addSearchResults($searchResults);
-        }
+        $searchResults = $gitHubAPI->api('search')->issues($q);
+        $result->addSearchResults($searchResults, $vids->pattern());
 
         return $result;
     }
