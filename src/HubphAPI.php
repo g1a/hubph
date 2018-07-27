@@ -79,7 +79,7 @@ class HubphAPI
     protected function projectAndOrgFromUrl($remote)
     {
         $remote = preg_replace('#^git@[^:]*:#', '', $remote);
-        $remote = preg_replace('#^[^:]*://[^/]/#', '', $remote);
+        $remote = preg_replace('#^[^:]*://[^/]*/#', '', $remote);
         $remote = preg_replace('#\.git$#', '', $remote);
 
         return $remote;
