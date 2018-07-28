@@ -104,8 +104,9 @@ class HubphCommands extends \Robo\Tasks implements ConfigAwareInterface, LoggerA
     public function prCreate(
         $options = [
             'message|m' => '',
+            'body' => '',
             'file|F' => '',
-            'base' => '',
+            'base' => 'master',
             'head' => '',
             'as' => 'default',
             'format' => 'yaml',
@@ -116,6 +117,7 @@ class HubphCommands extends \Robo\Tasks implements ConfigAwareInterface, LoggerA
 
         // Get the commit message from --message or --file
         $message = $this->getMessage($options);
+        list($org, $project) = explode('/', $projectWithOrg, 2);
 
         // Determine all of the vid/vval pairs if idempotent
         $vids = $this->getVids($options, $message);
@@ -127,7 +129,13 @@ class HubphCommands extends \Robo\Tasks implements ConfigAwareInterface, LoggerA
             return new CommandError($result, $status);
         }
 
-        // Go ahead and create the requested PR
+        // TODO: We could look up 'head' if it is not provided.
+        if (empty($options['head'])) {
+            throw new \Exceptions('Must provide --head');
+        }
+
+        // Create the requested PR
+        $api->prCreate($org, $project, $message, $options['body'], $options['base'], $options['head']);
 
         // If $result is an array, it will contain
         // all of the pull request numbers to close.

@@ -35,6 +35,18 @@ class HubphAPI
         return $authenticated;
     }
 
+    public function prCreate($org, $project, $title, $body, $base, $head)
+    {
+        $params = [
+            'title' => $title,
+            'body' => $body,
+            'base' => $base,
+            'head' => $head,
+        ];
+        $this->gitHubAPI()->api('pull_request')->create($org, $project, $params);
+        return $this;
+    }
+
     public function prClose($org, $project, $number)
     {
         foreach ((array)$number as $n) {
