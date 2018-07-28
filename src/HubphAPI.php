@@ -45,10 +45,8 @@ class HubphAPI
 
     public function prCheck($projectWithOrg, $vids)
     {
-        $gitHubAPI = $this->gitHubAPI();
-
         // Find all of the PRs that contain any vid
-        $existingPRs = $this->existingPRs($gitHubAPI, $projectWithOrg, $vids);
+        $existingPRs = $this->existingPRs($projectWithOrg, $vids);
 
         // Check to see if there are PRs matching all of the vids/vvals.
         // If so, exit with a message and do nothing.
@@ -85,13 +83,24 @@ class HubphAPI
         return $remote;
     }
 
-    protected function existingPRs($gitHubAPI, $projectWithOrg, $vids)
+    protected function existingPRs($projectWithOrg, $vids)
     {
         $preamble = $vids->getPreamble();
         $q = "repo:$projectWithOrg in:title is:pr state:open $preamble";
         $result = new PullRequests();
+        $gitHubAPI = $this->gitHubAPI();
         $searchResults = $gitHubAPI->api('search')->issues($q);
         $result->addSearchResults($searchResults, $vids->pattern());
+
+        return $result;
+    }
+
+    public function allPRs($projectWithOrg)
+    {
+        $q = "repo:$projectWithOrg in:title is:pr state:open";
+        $result = new PullRequests();
+        $searchResults = $this->gitHubAPI()->api('search')->issues($q);
+        $result->addSearchResults($searchResults);
 
         return $result;
     }
