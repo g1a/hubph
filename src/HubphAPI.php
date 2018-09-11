@@ -10,6 +10,7 @@ class HubphAPI
     protected $config;
     protected $token;
     protected $gitHubAPI;
+    protected $eventLogger;
     protected $as = 'default';
 
     /**
