@@ -3,6 +3,7 @@
 namespace Hubph;
 
 use Consolidation\Config\ConfigInterface;
+use Hubph\Internal\EventLogger;
 
 class HubphAPI
 {
