@@ -19,6 +19,21 @@ class HubphAPI
         $this->config = $config;
     }
 
+    public function startLogging($filename)
+    {
+        $this->stopLogging();
+        $this->eventLogger = new EventLogger($filename);
+        $this->eventLogger->start();
+    }
+
+    public function stopLogging()
+    {
+        if ($this->eventLogger) {
+            $this->eventLogger->stop();
+        }
+        $this->eventLogger = null;
+    }
+
     public function setAs($as)
     {
         if ($as != $this->as) {
@@ -43,7 +58,8 @@ class HubphAPI
             'base' => $base,
             'head' => $head,
         ];
-        $this->gitHubAPI()->api('pull_request')->create($org, $project, $params);
+        $response = $this->gitHubAPI()->api('pull_request')->create($org, $project, $params);
+        $this->logEvent(__FUNCTION__, [$org, $project], $params, $response);
         return $this;
     }
 
@@ -115,6 +131,20 @@ class HubphAPI
         $result->addSearchResults($searchResults);
 
         return $result;
+    }
+
+    /**
+     * Pass an event of note to the event logger
+     * @param string $event_name
+     * @param array $args
+     * @param array $params
+     * @param array $response
+     */
+    protected function logEvent($event_name, $args, $params, $response)
+    {
+        if ($this->eventLogger) {
+            $this->eventLogger->log($event_name, $args, $params, $response);
+        }
     }
 
     /**

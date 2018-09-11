@@ -1,6 +1,6 @@
 # Hubph
 
-Hubph (pronounced "huff") is an experimental PHP implementation of Hub.
+Hubph (pronounced "huff") is an experimental PHP implementation of [Hub](https://github.com/github/hub).
 
 [![Travis CI](https://travis-ci.org/g1a/hubph.svg?branch=master)](https://travis-ci.org/g1a/hubph)
 [![Windows CI](https://ci.appveyor.com/api/projects/status/{{PUT_APPVEYOR_STATUS_BADGE_ID_HERE}}?svg=true)](https://ci.appveyor.com/project/g1a/hubph)
