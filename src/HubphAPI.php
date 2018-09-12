@@ -178,18 +178,34 @@ class HubphAPI
     protected function getGitHubToken()
     {
         $as = $this->as;
+        $token = null;
         if ($as == 'default') {
             $as = $this->getConfig()->get("github.default-user");
         }
+
+        // First preference: There is a 'path' component in preferences
+        // pointing to a file containing the token.
         $github_token_cache = $this->getConfig()->get("github.personal-auth-token.$as.path");
         if (file_exists($github_token_cache)) {
             $token = trim(file_get_contents($github_token_cache));
-            putenv("GITHUB_TOKEN=$token");
-        } else {
-            $token = getenv('GITHUB_TOKEN');
         }
 
-        return $token;
+        // Second preference: There is an environment variable that begins
+        // with an uppercased version of the 'as' string followed by '_TOKEN'
+        if (!$token) {
+            $env_name = strtoupper(str_replace('-', '_', $as)) . '_TOKEN';
+            $token = getenv($env_name);
+        }
+
+        // If we read in a token from one of the preferred locations, then
+        // set the GITHUB_TOKEN environment variable and return it.
+        if ($token) {
+            putenv("GITHUB_TOKEN=$token");
+            return $token;
+        }
+
+        // Fallback: authenticate to whatever 'GITHUB_TOKEN' is already set to.
+        return getenv('GITHUB_TOKEN');
     }
 
     protected function getConfig()
