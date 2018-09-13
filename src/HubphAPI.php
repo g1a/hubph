@@ -85,13 +85,13 @@ class HubphAPI
             if (!$is_clean) {
                 return false;
             }
-            $shas[$pullRequest['id']] = $pullRequest['head']['sha'];
+            $shas[$n] = $pullRequest['head']['sha'];
         }
 
         // Merge all of the pull requests
-        foreach ($shas as $id => $sha) {
-            $response = $this->gitHubAPI()->api('pull_request')->merge($org, $project, $id, $message, $sha, $mergeMethod, $title);
-            $this->logEvent(__FUNCTION__, [$org, $project], [$id, $message, $sha, $mergeMethod, $title], $response);
+        foreach ($shas as $n => $sha) {
+            $response = $this->gitHubAPI()->api('pull_request')->merge($org, $project, $n, $message, $sha, $mergeMethod, $title);
+            $this->logEvent(__FUNCTION__, [$org, $project], [$n, $message, $sha, $mergeMethod, $title], $response);
         }
         return true;
     }
