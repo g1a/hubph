@@ -122,6 +122,33 @@ class HubphAPI
         return [$status, $existingPRs];
     }
 
+    public function prStatuses($projectWithOrg, $number)
+    {
+        list($org, $project) = explode('/', $projectWithOrg, 2);
+        $pullRequestStatus = $this->gitHubAPI()->api('pull_request')->status($org, $project, $number);
+
+        // Filter out the results based on 'target_url'
+        $filteredResults = [];
+        foreach (array_reverse($pullRequestStatus) as $id => $item) {
+            $filteredResults[$item['target_url']] = $item;
+        }
+        $pullRequestStatus = [];
+        foreach ($filteredResults as $target_url => $item) {
+            $pullRequestStatus[$item['id']] = $item;
+        }
+
+        // Put the most recently updated statuses at the top of the list
+        uasort(
+
+            $pullRequestStatus,
+            function ($lhs, $rhs) {
+                return abs(strtotime($lhs['updated_at']) - strtotime($rhs['updated_at']));
+            }
+        );
+
+        return $pullRequestStatus;
+    }
+
     public function addTokenAuthentication($url)
     {
         $token = $this->gitHubToken();

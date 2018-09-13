@@ -291,6 +291,8 @@ class HubphCommands extends \Robo\Tasks implements ConfigAwareInterface, LoggerA
      *   created_at: Created
      *   updated_at: Updated
      *   closed_at: Closed
+     *   mergeable: Mergeable
+     *   mergeable_state: Mergable State
      *   merged_at: Merged
      *   merge_commit_sha: Merge Commit
      *   assignee: Assignee
@@ -320,9 +322,44 @@ class HubphCommands extends \Robo\Tasks implements ConfigAwareInterface, LoggerA
 
         list($org, $project) = explode('/', $projectWithOrg, 2);
 
-        $pullRequests = $api->gitHubAPI()->api('pull_request')->show($org, $project, $number);
+        $pullRequest = $api->gitHubAPI()->api('pull_request')->show($org, $project, $number);
 
-        $result = new PropertyList($pullRequests);
+        $result = new PropertyList($pullRequest);
+        $this->alterPRTables($result);
+
+        return $result;
+    }
+
+    /**
+     * @command pr:statuses
+     * @field-labels
+     *   url: Url
+     *   id: ID
+     *   state: State
+     *   description: Description
+     *   node_id: Node ID
+     *   context: Context
+     *   avatar_url: Avatar URL
+     *   target_url: Target URL
+     *   creator: Creator
+     *   created_at: Created
+     *   updated_at: Updated
+     * @default-fields id,creator,state,description
+     * @default-string-field description
+     * @return Consolidation\OutputFormatters\StructuredData\RowsOfFields
+     */
+    public function prStatuses($projectWithOrg = '', $number = '', $options = ['as' => 'default', 'format' => 'yaml'])
+    {
+        if (empty($number) && preg_match('#^[0-9]*$#', $projectWithOrg)) {
+            $number = $projectWithOrg;
+            $projectWithOrg = '';
+        }
+        $api = $this->api($options['as']);
+        $projectWithOrg = $this->projectWithOrg($projectWithOrg);
+
+        $pullRequestStatus = $api->prStatuses($projectWithOrg, $number);
+
+        $result = new RowsOfFields($pullRequestStatus);
         $this->alterPRTables($result);
 
         return $result;
