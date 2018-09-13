@@ -65,12 +65,35 @@ class HubphAPI
         return $this;
     }
 
-    public function prClose($org, $project, $number)
+    public function prClose($org, $project, PullRequests $prs)
     {
-        foreach ((array)$number as $n) {
+        foreach ($prs->prNumbers() as $n) {
             $gitHubAPI = $this->gitHubAPI();
             $gitHubAPI->api('pull_request')->update($org, $project, $n, ['state' => 'closed']);
         }
+    }
+
+    public function prMerge($org, $project, PullRequests $prs, $message, $mergeMethod = 'squash', $title = null)
+    {
+        // First, check to see if all of the pull requests can be merged,
+        // and collect the sha hash of the head of the branch.
+        $allClean = true;
+        $shas = [];
+        foreach ($prs->prNumbers() as $n) {
+            $pullRequest = $this->gitHubAPI()->api('pull_request')->show($org, $project, $n);
+            $is_clean = $pullRequest['mergeable'] && $pullRequest['mergeable_state'] == 'clean';
+            if (!$is_clean) {
+                return false;
+            }
+            $shas[$pullRequest['id']] = $pullRequest['head']['sha'];
+        }
+
+        // Merge all of the pull requests
+        foreach ($shas as $id => $sha) {
+            $response = $this->gitHubAPI()->api('pull_request')->merge($org, $project, $id, $message, $sha, $mergeMethod, $title);
+            $this->logEvent(__FUNCTION__, [$org, $project], [$id, $message, $sha, $mergeMethod, $title], $response);
+        }
+        return true;
     }
 
     /**
@@ -79,7 +102,7 @@ class HubphAPI
      *
      * @param string $projectWithOrg org/project to check
      * @param VersionIdentifiers $vids
-     * @return [int $status, int[] $prs] status of PRs, and a list of PR numbers
+     * @return [int $status, PullRequests $prs] status of PRs, and a list of PR numbers
      *   - If $status is 0, then the caller should go ahead and create a new PR.
      *     The existing pull requests that would be superceded by the new PR are
      *     returned in the second parameter. These PRs could all be closed.
@@ -96,7 +119,7 @@ class HubphAPI
         $titles = $existingPRs->titles();
         $status = $vids->allExist($titles);
 
-        return [$status, $existingPRs->prNumbers()];
+        return [$status, $existingPRs];
     }
 
     public function addTokenAuthentication($url)
