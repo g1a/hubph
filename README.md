@@ -14,6 +14,8 @@ To try out hubph, download the phar from the [releases](https://github.com/g1a/h
 
 This is just a prototype project, so documentation is sparse, and the commands and their options may change at any time.
 
+This project does not necessarily do everything that Hub does, but it might also do some extra things that Hub does not do. The definition and scope of this project is still being explored.
+
 ### Local Development
 
 Clone this project and then run:

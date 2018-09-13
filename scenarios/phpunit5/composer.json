@@ -22,17 +22,16 @@
         "php": ">=5.5.0",
         "consolidation/filter-via-dot-access-data": "^0.1",
         "knplabs/github-api": "^2.7",
-        "symfony/filesystem": "^2.8|^3|^4"
+        "symfony/filesystem": "^2.8|^3|^4",
+        "consolidation/Robo": "^1.2.3",
+        "symfony/console": "^2.8|^3|^4",
+        "php-http/guzzle6-adapter": "^1.1"
     },
     "require-dev": {
-        "consolidation/Robo": "^1.2.3",
         "g1a/composer-test-scenarios": "^2",
-        "knplabs/github-api": "^2.7",
-        "php-http/guzzle6-adapter": "^1.1",
         "phpunit/phpunit": "^5.7.27",
         "satooshi/php-coveralls": "^2",
-        "squizlabs/php_codesniffer": "^2.8",
-        "symfony/console": "^2.8|^3|^4"
+        "squizlabs/php_codesniffer": "^2.8"
     },
     "scripts": {
         "phar:install-tools": [
@@ -53,7 +52,7 @@
             "@cs"
         ],
         "release": [
-            "( sed -e 's/-dev$//' VERSION > VERSION.tmp && mv -f VERSION.tmp VERSION && ver=\"$(cat VERSION)\" && git add VERSION && git commit -m \"Version $ver\" && git push origin master && git tag \"$ver\" && git push origin \"$ver\" && a=( ${ver//./ } ) && ((a[2]++)) && echo \"${a[0]}.${a[1]}.${a[2]}-dev\" > VERSION && git add VERSION && git commit -m \"Back to -dev\" && git push origin master )"
+            "release VERSION"
         ],
         "foo": [
             "( echo \"foo\" > bar && echo done )"

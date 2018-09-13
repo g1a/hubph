@@ -73,25 +73,30 @@ class HubphAPI
         }
     }
 
-    public function prCheck($projectWithOrg, $vids)
+    /**
+     * prCheck determines whether there are any open PRs that already exist
+     * that satisfy any of the provided $vids.
+     *
+     * @param string $projectWithOrg org/project to check
+     * @param VersionIdentifiers $vids
+     * @return [int $status, int[] $prs] status of PRs, and a list of PR numbers
+     *   - If $status is 0, then the caller should go ahead and create a new PR.
+     *     The existing pull requests that would be superceded by the new PR are
+     *     returned in the second parameter. These PRs could all be closed.
+     *   - If $status is >0, then there is no need to create a new PR, as there
+     *     are already existing PRs that are equivalent to the one that would
+     *     be open. The equivalent PRs are returned in the second parameter.
+     */
+    public function prCheck($projectWithOrg, VersionIdentifiers $vids)
     {
         // Find all of the PRs that contain any vid
         $existingPRs = $this->existingPRs($projectWithOrg, $vids);
 
         // Check to see if there are PRs matching all of the vids/vvals.
-        // If so, exit with a message and do nothing.
         $titles = $existingPRs->titles();
-        if ($vids->allExist($titles)) {
-            return [2, "Pull requests already exist; nothing more to do."];
-        }
+        $status = $vids->allExist($titles);
 
-        // Check to see if there are PRs matching SOME of the vids (with
-        // or without the matching vvals).  If so, close all that match.
-        if ($existingPRs->isEmpty()) {
-            return [0, "No open pull requests that need to be closed."];
-        }
-
-        return [0, $existingPRs->prNumbers()];
+        return [$status, $existingPRs->prNumbers()];
     }
 
     public function addTokenAuthentication($url)
@@ -113,7 +118,7 @@ class HubphAPI
         return $remote;
     }
 
-    protected function existingPRs($projectWithOrg, $vids)
+    protected function existingPRs($projectWithOrg, VersionIdentifiers $vids)
     {
         $preamble = $vids->getPreamble();
         $q = "repo:$projectWithOrg in:title is:pr state:open $preamble";
