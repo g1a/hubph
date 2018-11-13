@@ -155,6 +155,9 @@ class HubphAPI
         if (!$token) {
             return $url;
         }
+        if (strstr($url, 'github.com/') === false) {
+            return $url;
+        }
         $projectAndOrg = $this->projectAndOrgFromUrl($url);
         return "https://{$token}:x-oauth-basic@github.com/{$projectAndOrg}.git";
     }
