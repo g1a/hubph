@@ -155,7 +155,7 @@ class HubphAPI
         if (!$token) {
             return $url;
         }
-        if (strstr($url, 'github.com/') === false) {
+        if (!preg_match('#github\.com[/:]#', $url)) {
             return $url;
         }
         $projectAndOrg = $this->projectAndOrgFromUrl($url);
