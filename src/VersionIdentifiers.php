@@ -13,6 +13,7 @@ class VersionIdentifiers
     const DEFAULT_VVAL = '#.#.#';
     const EXTRA = '(?:(stable|beta|b|RC|alpha|a|patch|pl|p)((?:[.-]?\d+)*+)?)?([.-]?dev)?';
     const NUMBER = '[0-9]+';
+    const OPTIONAL_NUMBER = '[0-9]*';
 
     /**
      * VersionIdentifiers constructor
@@ -71,7 +72,8 @@ class VersionIdentifiers
 
         $vid_vval_regex = "({$vidPattern})({$vvalPattern}[._-]?)" . self::EXTRA;
 
-        $vid_vval_regex = str_replace('#.', '#\\.', $vid_vval_regex);
+        $vid_vval_regex = str_replace('.-', '\\.?' . self::OPTIONAL_NUMBER, $vid_vval_regex);
+        $vid_vval_regex = str_replace('.#', '\\.#', $vid_vval_regex);
         $vid_vval_regex = str_replace('#', self::NUMBER, $vid_vval_regex);
 
         return $vid_vval_regex;
