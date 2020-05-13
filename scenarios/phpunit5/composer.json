@@ -23,8 +23,8 @@
         "consolidation/filter-via-dot-access-data": "^0.1",
         "knplabs/github-api": "^2.7",
         "symfony/filesystem": "^2.8|^3|^4",
-        "consolidation/Robo": "^1.2.3",
-        "symfony/console": "^2.8|^3|^4",
+        "consolidation/robo": "^1.2.3",
+        "symfony/console": "^2.8|^3|^4|^5",
         "php-http/guzzle6-adapter": "^1.1"
     },
     "require-dev": {

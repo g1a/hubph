@@ -173,12 +173,16 @@ class HubphAPI
 
     protected function existingPRs($projectWithOrg, VersionIdentifiers $vids)
     {
-        $preamble = $vids->getPreamble();
+        return $this->matchingPRs($projectWithOrg, $vids->getPreamble(), $vids->pattern());
+    }
+
+    public function matchingPRs($projectWithOrg, $preamble, $pattern)
+    {
         $q = "repo:$projectWithOrg in:title is:pr state:open $preamble";
         $result = new PullRequests();
         $gitHubAPI = $this->gitHubAPI();
         $searchResults = $gitHubAPI->api('search')->issues($q);
-        $result->addSearchResults($searchResults, $vids->pattern());
+        $result->addSearchResults($searchResults, $pattern);
 
         return $result;
     }
