@@ -176,7 +176,7 @@ class HubphAPI
         return $this->matchingPRs($projectWithOrg, $vids->getPreamble(), $vids->pattern());
     }
 
-    public function matchingPRs($projectWithOrg, $preamble, $pattern)
+    public function matchingPRs($projectWithOrg, $preamble, $pattern = '')
     {
         $q = "repo:$projectWithOrg in:title is:pr state:open $preamble";
         $result = new PullRequests();
