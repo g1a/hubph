@@ -54,9 +54,6 @@
         "release": [
             "release VERSION"
         ],
-        "foo": [
-            "( echo \"foo\" > bar && echo done )"
-        ],
         "scenario": "scenarios/install",
         "post-update-cmd": [
             "dependency-licenses"
