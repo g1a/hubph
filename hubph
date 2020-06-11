@@ -26,7 +26,10 @@ $classLoader = require $autoloaderPath;
 $argv = $_SERVER['argv'];
 $appName = "Hubph";
 $appVersion = trim(file_get_contents(__DIR__ . '/VERSION'));
-$commandClasses = [ \Hubph\Cli\HubphCommands::class ];
+$commandClasses = [
+  \Consolidation\Filter\Hooks\FilterHooks::class,
+  \Hubph\Cli\HubphCommands::class,
+];
 $selfUpdateRepository = 'g1a/hubph';
 $configPrefix = 'HUBPH';
 $configFilePath = getenv($configPrefix . '_CONFIG') ?: getenv('HOME') . '/.hubph/hubph.yml';

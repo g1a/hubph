@@ -267,9 +267,61 @@ class HubphCommands extends \Robo\Tasks implements ConfigAwareInterface, LoggerA
 
         $pullRequests = $this->keyById($pullRequests, 'number');
         $result = new RowsOfFields($pullRequests);
-        $this->alterPRTables($result);
+        $this->addTableRenderFunction($result);
 
         return $result;
+    }
+
+    /**
+     * @command org:repos
+     * @param $org The org to list
+     * @filter-output
+     * @field-labels
+     *   url: Url
+     *   id: ID
+     *   owner: Owner
+     *   name: Shortname
+     *   full_name: Name
+     *   private: Private
+     *   fork: Fork
+     *   created_at: Created
+     *   updated_at: Updated
+     *   pushed_at: Pushed
+     *   git_url: Git URL
+     *   ssh_url: SSH URL
+     *   svn_url: SVN URL
+     *   homepage: Homepage
+     *   size: Size
+     *   stargazers_count: Stargazers
+     *   watchers_count: Watchers
+     *   language: Language
+     *   has_issues: Has Issues
+     *   has_projects: Has Projects
+     *   has_downloads: Has Downloads
+     *   has_wiki: Has Wiki
+     *   has_pages: Has Pages
+     *   forks_count: Forks
+     *   archived: Archived
+     *   disabled: Disabled
+     *   open_issues_count: Open Issues
+     *   default_branch: Default Branch
+     *   license: License
+     *   permissions: Permissions
+     * @default-fields full_name,language,default_branch
+     * @default-string-field full_name
+     *
+     * @return Consolidation\OutputFormatters\StructuredData\RowsOfFields
+     */
+    public function orgRepos($org, $options = ['as' => 'default', 'format' => 'table'])
+    {
+        $api = $this->api($options['as']);
+
+        $repos = $api->gitHubAPI()->api('organization')->repositories($org);
+
+        $data = new \Consolidation\OutputFormatters\StructuredData\RowsOfFields($repos);
+        $this->addTableRenderFunction($data);
+
+        return $data;
     }
 
     /**
@@ -325,7 +377,7 @@ class HubphCommands extends \Robo\Tasks implements ConfigAwareInterface, LoggerA
         $pullRequest = $api->gitHubAPI()->api('pull_request')->show($org, $project, $number);
 
         $result = new PropertyList($pullRequest);
-        $this->alterPRTables($result);
+        $this->addTableRenderFunction($result);
 
         return $result;
     }
@@ -360,7 +412,7 @@ class HubphCommands extends \Robo\Tasks implements ConfigAwareInterface, LoggerA
         $pullRequestStatus = $api->prStatuses($projectWithOrg, $number);
 
         $result = new RowsOfFields($pullRequestStatus);
-        $this->alterPRTables($result);
+        $this->addTableRenderFunction($result);
 
         return $result;
     }
@@ -418,20 +470,23 @@ class HubphCommands extends \Robo\Tasks implements ConfigAwareInterface, LoggerA
         $pullRequests = $this->keyById($pullRequests, 'number');
 
         $result = new RowsOfFields($pullRequests);
-        $this->alterPRTables($result);
+        $this->addTableRenderFunction($result);
 
         return $result;
     }
 
-    protected function alterPRTables($data)
+    protected function addTableRenderFunction($data)
     {
         $data->addRendererFunction(
             function ($key, $cellData, FormatterOptions $options, $rowData) {
+                if (empty($cellData)) {
+                    return '';
+                }
                 if (is_array($cellData)) {
-                    if (empty($cellData)) {
-                        return '';
+                    if ($key == 'permissions') {
+                        return implode(',', array_filter(array_keys($cellData)));
                     }
-                    foreach (['login', 'label'] as $k) {
+                    foreach (['login', 'label', 'name'] as $k) {
                         if (isset($cellData[$k])) {
                             return $cellData[$k];
                         }
@@ -465,24 +520,6 @@ class HubphCommands extends \Robo\Tasks implements ConfigAwareInterface, LoggerA
                 1,
                 0
             );
-    }
-
-    /**
-     * @hook alter @filter-output
-     * @option $filter Filter output based on provided expression
-     * @default $filter ''
-     */
-    public function filterOutput($result, CommandData $commandData)
-    {
-        $expr = $commandData->input()->getOption('filter');
-        if (!empty($expr)) {
-            $factory = LogicalOpFactory::get();
-            $op = $factory->evaluate($expr);
-            $filter = new FilterOutputData();
-            $result = $filter->filter($result, $op);
-        }
-
-        return $result;
     }
 
     protected function api($as = 'default')
