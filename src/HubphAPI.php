@@ -226,6 +226,14 @@ class HubphAPI
     }
 
     /**
+     * Return a result pager object using our cached GitHub API client.
+     */
+    public function resultPager()
+    {
+        return new \Github\ResultPager($this->gitHubAPI());
+    }
+
+    /**
      * Look up the GitHub token set either via environment variable or in the
      * auth-token cache directory.
      */

@@ -315,10 +315,64 @@ class HubphCommands extends \Robo\Tasks implements ConfigAwareInterface, LoggerA
     public function orgRepos($org, $options = ['as' => 'default', 'format' => 'table'])
     {
         $api = $this->api($options['as']);
+        $pager = $api->resultPager();
 
-        $repos = $api->gitHubAPI()->api('organization')->repositories($org);
+        $repoApi = $api->gitHubAPI()->api('organization');
+        $repos = $pager->fetchAll($repoApi, 'repositories', [$org]);
 
         $data = new \Consolidation\OutputFormatters\StructuredData\RowsOfFields($repos);
+        $this->addTableRenderFunction($data);
+
+        return $data;
+    }
+
+    /**
+     * @command repo:info
+     * @param $projectWithOrg The project to work on, e.g. org/project
+     * @field-labels
+     *   url: Url
+     *   id: ID
+     *   owner: Owner
+     *   name: Shortname
+     *   full_name: Name
+     *   private: Private
+     *   fork: Fork
+     *   created_at: Created
+     *   updated_at: Updated
+     *   pushed_at: Pushed
+     *   git_url: Git URL
+     *   ssh_url: SSH URL
+     *   svn_url: SVN URL
+     *   homepage: Homepage
+     *   size: Size
+     *   stargazers_count: Stargazers
+     *   watchers_count: Watchers
+     *   language: Language
+     *   has_issues: Has Issues
+     *   has_projects: Has Projects
+     *   has_downloads: Has Downloads
+     *   has_wiki: Has Wiki
+     *   has_pages: Has Pages
+     *   forks_count: Forks
+     *   archived: Archived
+     *   disabled: Disabled
+     *   open_issues_count: Open Issues
+     *   default_branch: Default Branch
+     *   license: License
+     *   permissions: Permissions
+     *
+     * @return Consolidation\OutputFormatters\StructuredData\PropertyList
+     */
+    public function repoInfo($projectWithOrg, $options = ['as' => 'default', 'format' => 'table'])
+    {
+        $api = $this->api($options['as']);
+
+        $projectWithOrg = $this->projectWithOrg($projectWithOrg);
+        list($org, $project) = explode('/', $projectWithOrg, 2);
+
+        $info = $api->gitHubAPI()->api('repo')->show($org, $project);
+
+        $data = new \Consolidation\OutputFormatters\StructuredData\PropertyList($info);
         $this->addTableRenderFunction($data);
 
         return $data;
