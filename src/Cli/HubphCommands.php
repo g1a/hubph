@@ -363,7 +363,7 @@ class HubphCommands extends \Robo\Tasks implements ConfigAwareInterface, LoggerA
      *
      * @return Consolidation\OutputFormatters\StructuredData\PropertyList
      */
-    public function repoInfo($projectWithOrg, $options = ['as' => 'default', 'format' => 'table'])
+    public function repoInfo($projectWithOrg = '', $options = ['as' => 'default', 'format' => 'table'])
     {
         $api = $this->api($options['as']);
 
@@ -376,6 +376,46 @@ class HubphCommands extends \Robo\Tasks implements ConfigAwareInterface, LoggerA
         $this->addTableRenderFunction($data);
 
         return $data;
+    }
+
+    /**
+     * @command repo:default-branch:switch
+     * @aliases switch-default
+     */
+    public function switchDefaultBranch($projectWithOrg = '', $options = ['as' => 'default', 'branch' => 'main'])
+    {
+        $api = $this->api($options['as']);
+
+        $projectWithOrg = $this->projectWithOrg($projectWithOrg);
+        list($org, $project) = explode('/', $projectWithOrg, 2);
+
+        $repoApi = $api->gitHubAPI()->api('repo');
+        $info = $repoApi->show($org, $project);
+        $currentDefault = $info['default_branch'];
+        $newDefault = $options['branch'];
+
+        if ($currentDefault == $newDefault) {
+            $this->logger->notice("Default branch is already {default}.", ['default' => $currentDefault]);
+            return;
+        }
+
+        $referencesApi = $api->gitHubAPI()->api('gitData')->references();
+
+        // Get the sha of the current HEAD of the current default
+        $currentDefaultInfo = $referencesApi->show($org, $project, "heads/$currentDefault");
+        $currentHeadSha = $currentDefaultInfo['object']['sha'];
+
+        // Create a new branch for the new default. If it's already there,
+        // then we'll assume it's at the desired SHA.
+        try {
+            $referencesApi->create($org, $project, ['ref' => "refs/heads/$newDefault", 'sha' => $currentHeadSha]);
+        }
+        catch (\Exception $e) {
+            $this->logger->notice("Branch {new} already exists; using it as-is.", ['new' => $newDefault]);
+        }
+
+        $result = $repoApi->update($org, $project, ['default_branch' => $newDefault]);
+        $this->logger->notice("Set default branch to {new}.", ['new' => $newDefault]);
     }
 
     /**
