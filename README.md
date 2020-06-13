@@ -2,10 +2,10 @@
 
 Hubph (pronounced "huff") is an experimental PHP implementation of [Hub](https://github.com/github/hub).
 
-[![Travis CI](https://travis-ci.org/g1a/hubph.svg?branch=master)](https://travis-ci.org/g1a/hubph)
+[![Travis CI](https://travis-ci.org/g1a/hubph.svg?branch=main)](https://travis-ci.org/g1a/hubph)
 [![Windows CI](https://ci.appveyor.com/api/projects/status/{{PUT_APPVEYOR_STATUS_BADGE_ID_HERE}}?svg=true)](https://ci.appveyor.com/project/g1a/hubph)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/g1a/hubph/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/g1a/hubph/?branch=master)
-[![Coverage Status](https://coveralls.io/repos/github/g1a/hubph/badge.svg?branch=master)](https://coveralls.io/github/g1a/hubph?branch=master) 
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/g1a/hubph/badges/quality-score.png?b=main)](https://scrutinizer-ci.com/g/g1a/hubph/?branch=main)
+[![Coverage Status](https://coveralls.io/repos/github/g1a/hubph/badge.svg?branch=main)](https://coveralls.io/github/g1a/hubph?branch=main) 
 [![License](https://img.shields.io/badge/license-MIT-408677.svg)](LICENSE)
 
 ## Getting Started
