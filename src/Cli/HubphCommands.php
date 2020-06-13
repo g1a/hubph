@@ -16,6 +16,7 @@ use Consolidation\AnnotatedCommand\CommandError;
 use Hubph\HubphAPI;
 use Hubph\VersionIdentifiers;
 use Hubph\PullRequests;
+use Hubph\Git\WorkingCopy;
 
 class HubphCommands extends \Robo\Tasks implements ConfigAwareInterface, LoggerAwareInterface
 {
@@ -405,17 +406,64 @@ class HubphCommands extends \Robo\Tasks implements ConfigAwareInterface, LoggerA
         $currentDefaultInfo = $referencesApi->show($org, $project, "heads/$currentDefault");
         $currentHeadSha = $currentDefaultInfo['object']['sha'];
 
-        // Create a new branch for the new default. If it's already there,
-        // then we'll assume it's at the desired SHA.
-        try {
-            $referencesApi->create($org, $project, ['ref' => "refs/heads/$newDefault", 'sha' => $currentHeadSha]);
-        }
-        catch (\Exception $e) {
-            $this->logger->notice("Branch {new} already exists; using it as-is.", ['new' => $newDefault]);
+        // TODO: We could pass $api here, but that would modify the remote url of 'origin'.
+        // For now we'll use whatever auth is set up for the project at the cwd.
+        $workingCopy = WorkingCopy::fromDir(getcwd());
+
+        if ($workingCopy->valid() && ($workingCopy->projectWithOrg() == $projectWithOrg)) {
+            $this->configureDefaultWithWorkingCopy($workingCopy, $currentDefault, $newDefault, $currentHeadSha);
+        } else {
+            // Create a new branch for the new default. If it's already there,
+            // then we'll assume it's at the desired SHA.
+            try {
+                $referencesApi->create($org, $project, ['ref' => "refs/heads/$newDefault", 'sha' => $currentHeadSha]);
+            } catch (\Exception $e) {
+                $this->logger->notice("Branch {new} already exists; using it as-is.", ['new' => $newDefault]);
+            }
         }
 
         $result = $repoApi->update($org, $project, ['default_branch' => $newDefault]);
         $this->logger->notice("Set default branch to {new}.", ['new' => $newDefault]);
+    }
+
+    protected function configureDefaultWithWorkingCopy($workingCopy, $currentDefault, $newDefault, $currentHeadSha)
+    {
+        $statusResult = $workingCopy->status();
+        if (!empty($statusResult)) {
+            throw new \Exception('Working copy not clean; commit, reset or ignore all modified files.');
+        }
+
+        // TODO: Check to see if new branch already exists, as we do for the API case?
+        $workingCopy->createBranch($newDefault, $currentHeadSha);
+
+        $fixupList = ['README.md', '.travis.yml', 'composer.json', '.circleci/config.yml'];
+        $alteredList = [];
+        foreach ($fixupList as $file) {
+            if (file_exists($file)) {
+                $contents = file_get_contents($file);
+                $altered = str_replace($currentDefault, $newDefault, $contents);
+                if ($altered != $contents) {
+                    file_put_contents($file, $altered);
+                    $alteredList[] = $file;
+                }
+            }
+        }
+
+        $statusResult = $workingCopy->status();
+        if (!empty($statusResult)) {
+            passthru('git diff');
+
+            // If we modified composer.json, update composer.lock
+            if (in_array('composer.json', $alteredList)) {
+                passthru('composer update');
+            }
+
+            $workingCopy->add('.');
+
+            $workingCopy->commit("Change references to old default branch '$currentDefault' to new default branch '$newDefault'");
+        }
+
+        $workingCopy->push('origin', $newDefault);
     }
 
     /**

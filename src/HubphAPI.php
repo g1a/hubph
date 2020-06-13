@@ -52,6 +52,22 @@ class HubphAPI
         return $authenticated;
     }
 
+    public function repoCreate($org, $project)
+    {
+        return $this->api->gitHubAPI()->api('repo')->create(
+            $project,
+            '',
+            '',
+            true,
+            $org
+        );
+    }
+
+    public function repoDelete($org, $project)
+    {
+        return $this->api->gitHubAPI()->api('repo')->remove($org, $project);
+    }
+
     public function prCreate($org, $project, $title, $body, $base, $head)
     {
         $params = [
