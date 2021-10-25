@@ -328,6 +328,31 @@ class HubphCommands extends \Robo\Tasks implements ConfigAwareInterface, LoggerA
     }
 
     /**
+     * @command repo:cat
+     */
+    public function repoCat($projectWithOrgAndPath = '', $options = ['as' => 'default', 'format' => 'string'])
+    {
+        $api = $this->api($options['as']);
+
+        $argParts = explode('/', $projectWithOrgAndPath, 3);
+        if (count($argParts) != 3) {
+            return new CommandError('First argument must include the org/owner, the project, and the path, all separated with "/"');
+        }
+
+        list($org, $project, $path) = $argParts;
+        $data = $api->gitHubAPI()->api('repo')->contents()->show($org, $project, $path);
+
+        // If the requested format is string, then return only the decoded
+        // contents. In all other instances, return the entire structured
+        // metadata structure, which includes the base64-encoded contents.
+        if ($options['format'] == 'string') {
+            $data = base64_decode($data['content']);
+        }
+
+        return $data;
+    }
+
+    /**
      * @command repo:info
      * @param $projectWithOrg The project to work on, e.g. org/project
      * @field-labels
