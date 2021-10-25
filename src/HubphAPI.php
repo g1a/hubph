@@ -155,7 +155,6 @@ class HubphAPI
 
         // Put the most recently updated statuses at the top of the list
         uasort(
-
             $pullRequestStatus,
             function ($lhs, $rhs) {
                 return abs(strtotime($lhs['updated_at']) - strtotime($rhs['updated_at']));
@@ -236,7 +235,7 @@ class HubphAPI
             $token = $this->gitHubToken();
 
             $this->gitHubAPI = new \Github\Client();
-            $this->gitHubAPI->authenticate($token, null, \Github\Client::AUTH_HTTP_TOKEN);
+            $this->gitHubAPI->authenticate($token, null, \Github\Client::AUTH_ACCESS_TOKEN);
         }
         return $this->gitHubAPI;
     }
