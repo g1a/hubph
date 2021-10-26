@@ -26,7 +26,7 @@ class ExtraCommands extends \Robo\Tasks implements ConfigAwareInterface, LoggerA
     /**
      * @command repo:convert-data
      */
-    public function repoConvertData($path,  $options = ['format' => 'json'])
+    public function repoConvertData($path, $options = ['format' => 'json'])
     {
         $repos = json_decode(file_get_contents($path), true);
 
@@ -101,7 +101,7 @@ class ExtraCommands extends \Robo\Tasks implements ConfigAwareInterface, LoggerA
         $repos = $pager->fetchAll($repoApi, 'repositories', [$org]);
 
         // Remove archived repositories from consideration
-        $repos = array_filter($repos, function($repo) {
+        $repos = array_filter($repos, function ($repo) {
             return empty($repo['archived']);
         });
 
@@ -122,8 +122,8 @@ class ExtraCommands extends \Robo\Tasks implements ConfigAwareInterface, LoggerA
                     $ownerSource = 'file';
                     $codeowners = static::filterGlobalCodeOwners($content);
                 }
+            } catch (\Exception $e) {
             }
-            catch (\Exception $e) {}
 
             list($codeowners, $ownerSource) = static::inferOwners($api, $org, $repo['name'], $codeowners, $ownerSource);
 
@@ -132,8 +132,7 @@ class ExtraCommands extends \Robo\Tasks implements ConfigAwareInterface, LoggerA
 
             if (empty($codeowners)) {
                 $repo['ownerTeam'] = 'n/a';
-            }
-            else {
+            } else {
                 $repo['ownerTeam'] = str_replace("@$org/", "", $codeowners[0]);
             }
 
@@ -148,7 +147,7 @@ class ExtraCommands extends \Robo\Tasks implements ConfigAwareInterface, LoggerA
 
     protected static function inferOwners($api, $org, $project, $codeowners, $ownerSource)
     {
-        $owningTeams = array_filter($codeowners, function($owner) use ($org) {
+        $owningTeams = array_filter($codeowners, function ($owner) use ($org) {
             // @pantheon-systems/sig-go is in the default CODEOWNERS file for the go-demo-service
             if (($owner == '@pantheon-systems/sig-go') || ($owner == '@pantheon-systems/upstream-maintenance')) {
                 return false;
@@ -173,19 +172,18 @@ class ExtraCommands extends \Robo\Tasks implements ConfigAwareInterface, LoggerA
             foreach ($teamsWithAccess as $team) {
                 if ($team['permissions']['admin']) {
                     $teamsWithAdmin[] = $team['slug'];
-                }
-                elseif ($team['permissions']['push']) {
+                } elseif ($team['permissions']['push']) {
                     $teamsWithWrite[] = $team['slug'];
                 }
             }
 
             // If there are any teams with admin, use them. Otherwise fall back to teams with write.
             $teams = empty($teamsWithAdmin) ? $teamsWithWrite : $teamsWithAdmin;
+        } catch (\Exception $e) {
         }
-        catch (\Exception $e) {}
 
         // Convert from team slug to @org/slug
-        $teams = array_map(function($team) use ($org) {
+        $teams = array_map(function ($team) use ($org) {
             return "@$org/$team";
         }, $teams);
 
