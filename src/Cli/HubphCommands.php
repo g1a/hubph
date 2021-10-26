@@ -353,6 +353,24 @@ class HubphCommands extends \Robo\Tasks implements ConfigAwareInterface, LoggerA
     }
 
     /**
+     * @command repo:teams
+     */
+    public function repoTeams($projectWithOrg = '', $options = ['as' => 'default', 'format' => 'yaml'])
+    {
+        $api = $this->api($options['as']);
+
+        $projectWithOrg = $this->projectWithOrg($projectWithOrg);
+        list($org, $project) = explode('/', $projectWithOrg, 2);
+
+        $teams = $api->gitHubAPI()->api('repo')->teams($org, $project);
+
+        $data = new \Consolidation\OutputFormatters\StructuredData\PropertyList($teams);
+        $this->addTableRenderFunction($data);
+
+        return $data;
+    }
+
+    /**
      * @command repo:info
      * @param $projectWithOrg The project to work on, e.g. org/project
      * @field-labels
