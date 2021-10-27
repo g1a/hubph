@@ -423,6 +423,44 @@ class HubphCommands extends \Robo\Tasks implements ConfigAwareInterface, LoggerA
     }
 
     /**
+     * @command repo:statuses
+     * @field-labels
+     *   url: Url
+     *   avatar_url: Avatar Url
+     *   id: ID
+     *   state: State
+     *   description: Description
+     *   target_url: Target Url
+     *   context: Context
+     *   created_at: Created
+     *   updated_at: Updated
+     *   creator: Creator
+     * @default-fields context,state,description
+     * @default-string-field context
+     */
+    public function repoStatuses($projectWithOrg = '', $options = ['as' => 'default', 'format' => 'table'])
+    {
+        $api = $this->api($options['as']);
+
+        $projectWithOrg = $this->projectWithOrg($projectWithOrg);
+        list($org, $project) = explode('/', $projectWithOrg, 2);
+
+        $info = $api->gitHubAPI()->api('repo')->show($org, $project);
+        $statuses = $api->gitHubAPI()->api('repo')->statuses()->show($org, $project, $info['default_branch']);
+
+        $statusResults = [];
+        foreach (array_reverse($statuses) as $status) {
+            $key = $status['context'];
+            $statusResults[$key] = $status;
+        }
+
+        $data = new \Consolidation\OutputFormatters\StructuredData\RowsOfFields(array_values($statusResults));
+        $this->addTableRenderFunction($data);
+
+        return $data;
+    }
+
+    /**
      * @command repo:default-branch:switch
      * @aliases switch-default
      */
