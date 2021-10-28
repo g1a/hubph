@@ -18,7 +18,9 @@ class EventLogger implements EventLoggerInterface
 
     public function start()
     {
-        @unlink($this->filename);
+        if (file_exists($this->filename)) {
+            @unlink($this->filename);
+        }
     }
 
     public function stop()
