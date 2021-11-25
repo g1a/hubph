@@ -60,6 +60,11 @@ class ExtraCommands extends \Robo\Tasks implements ConfigAwareInterface, LoggerA
         'as' => 'default',
         'codeowners' => '',
         'support-level-badge' => '',
+        'branch-name' => 'project-update-info',
+        'commit-message' => 'Update project information.',
+        'pr-title' => 'Update project information.',
+        'pr-body' => '',
+        'base-branch' => 'master',
     ])
     {
         if (count(explode('/', $project)) != 2) {
@@ -72,14 +77,15 @@ class ExtraCommands extends \Robo\Tasks implements ConfigAwareInterface, LoggerA
         $remote = new Remote($url);
         $api = $this->api($options['as']);
         $dir = sys_get_temp_dir() . '/hubph/' . $remote->project();
-        $workingCopy = WorkingCopy::clone($url, $dir, $api);
+        $baseBranch = $options['base-branch'];
+        $workingCopy = WorkingCopy::cloneBranch($url, $dir, $baseBranch, $api);
 
         // Set logger for workingCopy, is this correct?
         if ($this->logger) {
             $workingCopy->setLogger($this->logger);
         }
-        // @todo: option?
-        $branchName = 'project-update-info';
+
+        $branchName = $options['branch-name'];
         $workingCopy->createBranch($branchName);
         $workingCopy->switchBranch($branchName);
 
@@ -151,17 +157,12 @@ class ExtraCommands extends \Robo\Tasks implements ConfigAwareInterface, LoggerA
             $workingCopy->add("$dir/README.md");
         }
 
-        // @todo: Improve message. option?
-        $workingCopy->commit('Update project info.');
+        $commit_message = $options['commit-message'];
+        $workingCopy->commit($commit_message);
         $workingCopy->push('origin', $branchName);
-        // @todo Get message from option?
-        $message = 'Update project information';
-        // @todo: Get body from option?
-        $body = 'Lorem ipsum';
-        // @todo: Set base branch?
-        $base = 'master';
-        // @todo: support Fork?
-        $workingCopy->pr($message, $body, $base, $branchName);
+        $message = $options['pr-title'];
+        $body = $options['pr-body'];
+        $workingCopy->pr($message, $body, $baseBranch, $branchName);
     }
 
     /**
