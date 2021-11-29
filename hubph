@@ -29,7 +29,6 @@ $appVersion = trim(file_get_contents(__DIR__ . '/VERSION'));
 $commandClasses = [
   \Consolidation\Filter\Hooks\FilterHooks::class,
   \Hubph\Cli\HubphCommands::class,
-  \Hubph\Cli\ExtraCommands::class,
 ];
 $selfUpdateRepository = 'g1a/hubph';
 $configPrefix = 'HUBPH';
