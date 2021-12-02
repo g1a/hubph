@@ -2,15 +2,41 @@
 
 namespace Hubph;
 
-class PullRequests
+class PullRequests implements \Iterator
 {
     protected $prs = [];
+    protected $position = 0;
 
     /**
      * PullRequests constructor
      */
     public function __construct()
     {
+    }
+
+    public function rewind()
+    {
+        $this->position = 0;
+    }
+
+    public function current()
+    {
+        return $this->prs[$this->position];
+    }
+
+    public function key()
+    {
+        return $this->position;
+    }
+
+    public function next()
+    {
+        ++$this->position;
+    }
+
+    public function valid()
+    {
+        return isset($this->prs[$this->position]);
     }
 
     public function addSearchResults($searchResults, $pattern = '')
@@ -27,7 +53,7 @@ class PullRequests
 
     public function add($pr)
     {
-        $this->prs[$pr['number']] = $pr;
+        $this->prs[] = $pr;
     }
 
     public function titles()
@@ -43,7 +69,11 @@ class PullRequests
 
     public function prNumbers()
     {
-        return array_keys($this->prs);
+        $prNumbers = [];
+        foreach ($this->prs as $pr) {
+            $prNumbers[] = $pr['number'];
+        }
+        return $prNumbers;
     }
 
     public function isEmpty()
