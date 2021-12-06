@@ -68,6 +68,11 @@ class HubphAPI
         return $this->api->gitHubAPI()->api('repo')->remove($org, $project);
     }
 
+    public function prGet($org, $project, $id)
+    {
+        return $this->gitHubAPI()->api('pull_request')->show($org, $project, $id);
+    }
+
     public function prCreate($org, $project, $title, $body, $base, $head)
     {
         $params = [
