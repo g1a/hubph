@@ -228,6 +228,15 @@ class HubphAPI
         return $result;
     }
 
+    public function prGetComments($org, $project, $id, $include_reviews = true)
+    {
+        $comments = $this->gitHubAPI()->api('issue')->comments()->all($org, $project, $id);
+        if ($include_reviews) {
+            $comments = array_merge($comments, $this->gitHubAPI()->api('pull_request')->reviews()->all($org, $project, $id));
+        }
+        return $comments;
+    }
+
     /**
      * Pass an event of note to the event logger
      * @param string $event_name
