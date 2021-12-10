@@ -207,6 +207,17 @@ class HubphAPI
         return $result;
     }
 
+    public function matchingPRsInUser($user, $preamble, $pattern = '')
+    {
+        $q = "user:$user in:title archived:false is:pr state:open $preamble";
+        $result = new PullRequests();
+        $gitHubAPI = $this->gitHubAPI();
+        $searchResults = $gitHubAPI->api('search')->issues($q);
+        $result->addSearchResults($searchResults, $pattern);
+
+        return $result;
+    }
+
     public function allPRs($projectWithOrg)
     {
         $q = "repo:$projectWithOrg in:title is:pr state:open";
