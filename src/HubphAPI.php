@@ -237,6 +237,11 @@ class HubphAPI
         return $comments;
     }
 
+    public function prGetDiff($org, $project, $id)
+    {
+        return $this->gitHubAPI()->api('pull_request')->configure('diff')->show($org, $project, $id);
+    }
+
     /**
      * Pass an event of note to the event logger
      * @param string $event_name
