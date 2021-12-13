@@ -207,6 +207,17 @@ class HubphAPI
         return $result;
     }
 
+    public function matchingPRsInUser($user, $preamble, $pattern = '')
+    {
+        $q = "user:$user in:title archived:false is:pr state:open $preamble";
+        $result = new PullRequests();
+        $gitHubAPI = $this->gitHubAPI();
+        $searchResults = $gitHubAPI->api('search')->issues($q);
+        $result->addSearchResults($searchResults, $pattern);
+
+        return $result;
+    }
+
     public function allPRs($projectWithOrg)
     {
         $q = "repo:$projectWithOrg in:title is:pr state:open";
@@ -215,6 +226,20 @@ class HubphAPI
         $result->addSearchResults($searchResults);
 
         return $result;
+    }
+
+    public function prGetComments($org, $project, $id, $include_reviews = true)
+    {
+        $comments = $this->gitHubAPI()->api('issue')->comments()->all($org, $project, $id);
+        if ($include_reviews) {
+            $comments = array_merge($comments, $this->gitHubAPI()->api('pull_request')->reviews()->all($org, $project, $id));
+        }
+        return $comments;
+    }
+
+    public function prGetDiff($org, $project, $id)
+    {
+        return $this->gitHubAPI()->api('pull_request')->configure('diff')->show($org, $project, $id);
     }
 
     /**
