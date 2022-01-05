@@ -73,7 +73,7 @@ class HubphAPI
         return $this->gitHubAPI()->api('pull_request')->show($org, $project, $id);
     }
 
-    public function prCreate($org, $project, $title, $body, $base, $head, &$response = null)
+    public function prOpen($org, $project, $title, $body, $base, $head)
     {
         $params = [
             'title' => $title,
@@ -81,7 +81,12 @@ class HubphAPI
             'base' => $base,
             'head' => $head,
         ];
-        $response = $this->gitHubAPI()->api('pull_request')->create($org, $project, $params);
+        return $this->gitHubAPI()->api('pull_request')->create($org, $project, $params);
+    }
+
+    public function prCreate($org, $project, $title, $body, $base, $head)
+    {
+        $this->prOpen($org, $project, $title, $body, $base, $head);
         $this->logEvent(__FUNCTION__, [$org, $project], $params, $response);
         return $this;
     }
