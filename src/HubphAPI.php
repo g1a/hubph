@@ -86,10 +86,15 @@ class HubphAPI
         return $this;
     }
 
-    public function prClose($org, $project, PullRequests $prs)
+    public function prClose($org, $project, PullRequests $prs, $comment = '')
     {
         foreach ($prs->prNumbers() as $n) {
             $gitHubAPI = $this->gitHubAPI();
+            if ($comment) {
+                $gitHubAPI->api('issue')->comments()->create($org, $project, $n, [
+                    'body' => $comment,
+                ]);
+            }
             $gitHubAPI->api('pull_request')->update($org, $project, $n, ['state' => 'closed']);
         }
     }
