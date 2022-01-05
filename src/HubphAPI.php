@@ -73,7 +73,7 @@ class HubphAPI
         return $this->gitHubAPI()->api('pull_request')->show($org, $project, $id);
     }
 
-    public function prCreate($org, $project, $title, $body, $base, $head)
+    public function prCreate($org, $project, $title, $body, $base, $head, &$response = null)
     {
         $params = [
             'title' => $title,
