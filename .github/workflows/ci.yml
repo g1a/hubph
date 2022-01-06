@@ -29,10 +29,10 @@ jobs:
         run: composer scenario "${SCENARIO}" "${DEPENDENCIES}"
       - name: Run tests
         run: composer test
-      - name: Run coveralls
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: php vendor/bin/php-coveralls --coverage_clover=build/logs/clover.xml -v
+      #- name: Run coveralls
+      #  env:
+      #    COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #  run: php vendor/bin/php-coveralls --coverage_clover=build/logs/clover.xml -v
 
   build_phar:
     runs-on: ubuntu-latest
