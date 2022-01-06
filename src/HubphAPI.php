@@ -86,7 +86,7 @@ class HubphAPI
 
     public function prCreate($org, $project, $title, $body, $base, $head)
     {
-        $this->prOpen($org, $project, $title, $body, $base, $head);
+        $response = $this->prOpen($org, $project, $title, $body, $base, $head);
         $this->logEvent(__FUNCTION__, [$org, $project], $params, $response);
         return $this;
     }
