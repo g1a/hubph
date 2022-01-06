@@ -11,7 +11,7 @@ jobs:
         dependencies: ['lock']
         include:
           - php-versions: 7.4
-            dependencies: hightest
+            dependencies: highest
             operating-system: 'ubuntu-latest'
     env:
       SCENARIO: default
