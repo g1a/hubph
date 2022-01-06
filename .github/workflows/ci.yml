@@ -29,8 +29,22 @@ jobs:
         run: composer scenario "${SCENARIO}" "${DEPENDENCIES}"
       - name: Run tests
         run: composer test
-      - name: Run coveralls
-        run: php vendor/bin/php-coveralls -v
+      - name: Coveralls Parallel
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.github_token }}
+          flag-name: run-${{ matrix.operating-system }}-${{ matrix.php-version }}-${{ matrix.dependencies }}
+          parallel: true
+
+  coveralls_finish:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Coveralls Finished
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.github_token }}
+        parallel-finished: true
 
   build_phar:
     runs-on: ubuntu-latest
