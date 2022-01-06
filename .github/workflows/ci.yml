@@ -12,7 +12,6 @@ jobs:
     env:
       SCENARIO: default
       DEPENDENCIES: ${{ matrix.dependencies }}
-    needs: [ checkout_build ]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
