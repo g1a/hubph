@@ -1,0 +1,73 @@
+name: Hubh
+on: push
+jobs:
+  test:
+    runs-on: ${{ matrix.operating-system }}
+    name: Functional testing matrix - PHP ${{ matrix.php-versions }} on ${{ matrix.operating-system }} (${{ matrix.dependencies }})
+    strategy:
+      matrix:
+        operating-system: ['ubuntu-latest', 'macos-latest']
+        php-versions: [ '7.3', '7.4', '8.0', '8.1' ]
+        dependencies: ['highest', 'lowest', 'lock']
+    env:
+      SCENARIO: default
+      DEPENDENCIES: ${{ matrix.dependencies }}
+    needs: [ checkout_build ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      # @todo cache?
+      - name: Install dependencies
+        run: composer scenario "${SCENARIO}" "${DEPENDENCIES}"
+      - name: Run tests
+        run: composer test
+      - name: Run coveralls
+        run: php vendor/bin/php-coveralls -v
+
+  build_phar:
+    runs-on: ubuntu-latest
+    container:
+      image: quay.io/pantheon-public/php-ci:v7.4
+    needs: [ test ]
+    name: Checkout & build Phar
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Save repo content as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: full-workspace
+          path: ${{ github.workspace }}
+      - name: Install tools
+        run: composer phar:install-tools
+      - name: Run Composer Install
+        run: composer install --prefer-dist --no-dev --no-interaction
+      - name: Phar Build
+        run: php box.phar build
+      - name: permissions
+        run: chmod +x ./hubph.phar
+      - name: Save hubph.phar as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: hubph-phar
+          path: hubph.phar
+          if-no-files-found: error
+
+  release:
+    runs-on: ubuntu-latest
+    name: Release
+    container:
+      image: quay.io/pantheon-public/php-ci:v7.4
+    needs: [ build_phar ]
+    if: ${{ startsWith(github.ref, 'refs/tags/')  && github.repository == 'g1a/hubph' }}
+    steps:
+      - name: Download hubph.phar as artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: hubph-phar
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: hubph.phar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
