@@ -8,7 +8,11 @@ jobs:
       matrix:
         operating-system: ['ubuntu-latest', 'macos-latest']
         php-versions: [ '7.3', '7.4', '8.0', '8.1' ]
-        dependencies: ['highest', 'lowest', 'lock']
+        dependencies: ['lock']
+        include:
+          - php-versions: 7.4
+            dependencies: hightest
+            operating-system: 'ubuntu-latest'
     env:
       SCENARIO: default
       DEPENDENCIES: ${{ matrix.dependencies }}
