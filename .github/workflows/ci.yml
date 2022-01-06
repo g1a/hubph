@@ -7,8 +7,8 @@ jobs:
     strategy:
       matrix:
         operating-system: ['ubuntu-latest', 'macos-latest']
-        # @todo: Add 8.1 coverage.
-        php-version: [ '7.3', '7.4', '8.0']
+        # @todo: Add 8.1 & 8.0 coverage.
+        php-version: [ '7.3', '7.4']
         dependencies: ['lock']
         include:
           - php-version: 7.4
