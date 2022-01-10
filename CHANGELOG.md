@@ -1,5 +1,28 @@
 # Changelog
 
+### 0.6.4 - 2022-01-10
+
+* Support returning info about created PR and optionally add comment to PR being closed. (#48)
+
+### 0.6.3 - 2021-12-13
+
+* Add new prGetDiff function.
+* Add prGetComments function.
+* Add new matchingPrsInUser function.
+
+### 0.6.2 - 2021-12-06
+
+* Add new prGet function
+
+### 0.6.1 - 2021-12-01
+
+* Make PullRequests class to implement Iterable
+
+### 0.6.0 - 2021-11-29
+
+* PHP 8
+* Remove ExtraCommands.
+
 ### 0.5.0 - 2021-10-27
 
 * repo:statuses
