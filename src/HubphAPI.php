@@ -223,7 +223,8 @@ class HubphAPI
         $q = "user:$user in:title archived:false is:pr state:open $preamble";
         $result = new PullRequests();
         $gitHubAPI = $this->gitHubAPI();
-        $searchResults = $gitHubAPI->api('search')->issues($q);
+        $searchApi = $gitHubAPI->api('search')->setPerPage(100);
+        $searchResults = $searchApi->issues($q);
         $result->addSearchResults($searchResults, $pattern);
 
         return $result;
